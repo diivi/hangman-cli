@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+// #include <unistd.h>
 // #include <dos.h>
 #include <time.h>
 
@@ -168,6 +168,7 @@ int main(int argc, char *argv[]) {
     printf("\033[38;5;165m");
     printf("--------------------------Difficulty--------------------------\n\n("
            "1 word str {hard/easy} ) - Sets the difficulty for this round\n\n");
+    printf("\033[0m");
     return 1;
   }
   // Fetch related words from api as json_string
@@ -257,13 +258,12 @@ int main(int argc, char *argv[]) {
     if (strcmp(guessed_str, word_str) == 0) {
       printf("\033[38;5;46m");
       printf("\nYou guessed the word!\n\n");
-      sleep(2);
+      // sleep(2);
       printf("\033[0m");
       break;
     }
 
     printf("\n\nTake a Guess! ");
-    printf("\n%s ", word_str);
     char guess_char;
 
 
@@ -279,9 +279,9 @@ int main(int argc, char *argv[]) {
       printf("\033[0m");
     } else {
       if (strchr(word_str, guess_char) != NULL) { // if letter is in word
-        printf("\033[38;5;46m");
-        printf("\nCorrectly guessed %c!\n", guess_char);
-        printf("\033[0m");
+        // printf("\033[38;5;46m");
+        // printf("\nCorrectly guessed %c!\n", guess_char);
+        // printf("\033[0m");
         // sleep(2);
 
         guessed_letters[guessed_char_index] = guess_char;
@@ -294,19 +294,19 @@ int main(int argc, char *argv[]) {
           }
         }
       } else {
-        printf("\033[38;5;196m");
-        printf("\nIncorrect guess %c!\n", guess_char);
-        printf("\033[0m");
+        // printf("\033[38;5;196m");
+        // printf("\nIncorrect guess %c!\n", guess_char);
+        // printf("\033[0m");
         // sleep(2);
         chances--;
       }
     }
     if (chances == 0) {
       printf("\033[38;5;196m");
+      printf("\nYou lost! The word was %s\n", word_str);
       printf("\nBetter Luck Next Time!\n\n");
-      sleep(2);
+      // sleep(2);
       printf("\033[0m");
     }
   }
 }
-// validate input
