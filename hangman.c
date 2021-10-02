@@ -129,7 +129,7 @@ struct json_string {
 
 void init_json_string(struct json_string *s) {
   s->len = 0;
-  s->ptr = malloc(s->len + 1);
+  s->ptr = (char*)malloc(s->len + 1);
   if (s->ptr == NULL) {
     fprintf(stderr, "malloc() failed\n");
     exit(EXIT_FAILURE);
@@ -139,7 +139,7 @@ void init_json_string(struct json_string *s) {
 
 size_t writefunc(void *ptr, size_t size, size_t nmemb, struct json_string *s) {
   size_t new_len = s->len + size * nmemb;
-  s->ptr = realloc(s->ptr, new_len + 1);
+  s->ptr = (char*)realloc(s->ptr, new_len + 1);
   if (s->ptr == NULL) {
     fprintf(stderr, "realloc() failed\n");
     exit(EXIT_FAILURE);
@@ -151,29 +151,45 @@ size_t writefunc(void *ptr, size_t size, size_t nmemb, struct json_string *s) {
   return size * nmemb;
 }
 
-int main(int argc, char *argv[]) {
-
-  //    system("clear");
-  if (argc != 3 || validate_args(argv) == 0) {
-    printf("\033[38;5;196m");
-    printf("%s\n\033[0m", ascii_intro);
+int check_if_play_again(){
     printf("\033[38;5;220m");
-    printf("\nWelcome to the hangman CLI!\n\033[0m");
-    printf("\033[47;30m");
-    printf(" Usage: %s <genre> <difficulty> \033[0m\n\n", argv[0]);
-    printf("\033[38;5;206m");
-    printf(
-        "----------------------------Genre----------------------------\n\n(1 "
-        "word str) - Words related to this genre/topic will be fetched\n\n");
-    printf("\033[38;5;165m");
-    printf("--------------------------Difficulty--------------------------\n\n("
-           "1 word str {hard/easy} ) - Sets the difficulty for this round\n\n");
-    printf("\033[0m");
-    return 1;
-  }
+    printf("Do you wish to play again?\n");
+    printf("[y]es   [n]o\n");
+
+    char user_play_again;
+    char c;
+
+    do{
+      c = getchar();
+
+      if(c == 'y' || c == 'n'){
+        user_play_again = c;
+        break;
+      }
+      else{
+        printf("Invalid! Enter 'y' to repear or 'n' to end \n");
+      }
+      while(getchar() != '\n');
+    }while(1);
+
+
+    if(user_play_again=='y'){
+      printf("\033[38;5;46m");
+      printf("Reinitializing");
+      return 1;
+    }
+    else{
+      printf("\033[38;5;46m");
+      printf("Bye! Have a good day!\n");
+      return 0;
+    }
+}
+
+
+int game_loop(char* genre){
   // Fetch related words from api as json_string
   char fetch_url[256] = "https://api.datamuse.com/words?topics=";
-  strcat(fetch_url, argv[1]);
+  strcat(fetch_url, genre);
   struct json_string s;
 
   CURLcode res;
@@ -219,6 +235,7 @@ int main(int argc, char *argv[]) {
   int rand_word_index = (rand() % (json_array_size(root))) +
                         1; // random number between 0 and length of array
   // loop through array, each iteration is a word object
+
   for (int i = 0; i < json_array_size(root); i++) {
 
     json_t *data, *word, *score, *tags;
@@ -245,6 +262,9 @@ int main(int argc, char *argv[]) {
                              // string)
   memset(&guessed_str[0], '_', sizeof(guessed_str)-1);
   guessed_str[letters] = '\0';
+
+  //Main game loop
+  int play_again = 0;
   while (chances > 0) {
     // print corresponding frame
     system("clear");
@@ -260,6 +280,7 @@ int main(int argc, char *argv[]) {
       printf("\nYou guessed the word!\n\n");
       // sleep(2);
       printf("\033[0m");
+      play_again = check_if_play_again();
       break;
     }
 
@@ -307,6 +328,41 @@ int main(int argc, char *argv[]) {
       printf("\nBetter Luck Next Time!\n\n");
       // sleep(2);
       printf("\033[0m");
+      play_again = check_if_play_again();
     }
   }
+
+  if(play_again){
+    return game_loop(genre);
+  }
+
+  return 0;
+}
+
+int main(int argc, char *argv[]) {
+  //    system("clear");
+  //For the case when arguments are not given
+  if (argc != 3 || validate_args(argv) == 0) {
+    printf("\033[38;5;196m");
+    printf("%s\n\033[0m", ascii_intro);
+    printf("\033[38;5;220m");
+    printf("\nWelcome to the hangman CLI!\n\033[0m");
+    printf("\033[47;30m");
+    printf(" Usage: %s <genre> <difficulty> \033[0m\n\n", argv[0]);
+    printf("\033[38;5;206m");
+    printf(
+        "----------------------------Genre----------------------------\n\n(1 "
+        "word str) - Words related to this genre/topic will be fetched\n\n");
+    printf("\033[38;5;165m");
+    printf("--------------------------Difficulty--------------------------\n\n("
+           "1 word str {hard/easy} ) - Sets the difficulty for this round\n\n");
+    printf("\033[0m");
+    return 1;
+  }
+
+  char* genre = argv[1];
+  int ret_value = game_loop(genre);
+
+  return 0;
+
 }
