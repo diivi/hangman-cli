@@ -15,13 +15,13 @@ Fetches data related to a genre from the [DataMuse](https://www.datamuse.com/api
 
 # Requirements
 1. CURL
-sudo apt-get install libcurl4-openssl-dev
+`sudo apt-get install libcurl4-openssl-dev`
 
 2. libjansson-dev
-sudo apt-get install -y libjansson-dev
+`sudo apt-get install -y libjansson-dev`
 
 # Compile
-gcc hangman.c -o hangman -lcurl -ljansson
+`gcc hangman.c -o hangman -lcurl -ljansson`
 
 # Run
 Download the linux executable `hangman` and run
