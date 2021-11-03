@@ -159,28 +159,25 @@ int check_if_play_again(){
     char user_play_again;
     char c;
 
-    do{
-      c = getchar();
-
-      if(c == 'y' || c == 'n'){
-        user_play_again = c;
-        break;
-      }
-      else{
-        printf("Invalid! Enter 'y' to repear or 'n' to end \n");
-      }
-      while(getchar() != '\n');
-    }while(1);
-
+    c = getchar();
+    if(c != '\n') while(getchar()!='\n');
+    while(c != 'y' && c != 'n'){
+      printf("Invalid! Enter 'y' to repear or 'n' to end \n");
+    c = getchar();
+    if(c != '\n') while(getchar()!='\n');
+    }
+    user_play_again = c;
 
     if(user_play_again=='y'){
       printf("\033[38;5;46m");
-      printf("Reinitializing");
+      printf("Reinitializing\n");
+      printf("\033[0m"); // restore de default color
       return 1;
     }
     else{
       printf("\033[38;5;46m");
       printf("Bye! Have a good day!\n");
+      printf("\033[0m"); // restore de default color
       return 0;
     }
 }
